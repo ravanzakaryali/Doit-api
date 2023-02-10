@@ -1,4 +1,5 @@
-module.exports={
-    user: require('./user.model'),
-    todo: require('./todo.model'),
+const user = require('./user.model');
+module.exports = {
+    user: user,
+    // todo: require('./todo.model'),
 }

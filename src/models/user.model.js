@@ -1,8 +1,7 @@
 const { Schema, default: mongoose } = require("mongoose");
 
 const userSchema = new Schema({
-    firstName: String,
-    lastName: String,
+    fullName: String,
     username: {
         type: String,
         required: true,
@@ -21,6 +20,18 @@ const userSchema = new Schema({
     },
     updatedDate: Date,
     isDeleted: {
+        type: Boolean,
+        default: false
+    },
+    confirmCode: {
+        type: Number,
+        required: true,
+    },
+    confirmCodeExpDate: {
+        type: Date,
+        required: true,
+    },
+    isConfirm: {
         type: Boolean,
         default: false
     }

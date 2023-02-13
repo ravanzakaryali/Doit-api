@@ -3,7 +3,7 @@ const randomNumberGenerator = (min = 1, max = 10) => {
 }
 
 const setDateMinutes = (minutes = 5) => {
-    return new Date(new Date().setMinutes(new Date().getMinutes() + minutes)).toLocaleString();
+    return new Date(new Date().setMinutes(new Date().getMinutes() + minutes));
 }
 
 

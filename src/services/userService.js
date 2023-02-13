@@ -1,4 +1,6 @@
+const { randomNumberGenerator, setDateMinutes } = require("../helpers");
 const userModel = require("../models/user.model");
+const { sendMessage } = require("./emailService");
 
 const usernameGenerator = async (fullName, number = 1) => {
     const username = fullName.toLowerCase().replace(' ', '_').replace('ə', 'e');
@@ -13,4 +15,17 @@ const usernameGenerator = async (fullName, number = 1) => {
     return username;
 }
 
-module.exports = usernameGenerator;
+const confirmCodeSendMail = async (email) => {
+    const confirmCode = randomNumberGenerator(100000, 999999);
+    const response = await sendMessage(confirmCode, email);
+    const expDate = setDateMinutes();
+    return {
+        confirmCode: confirmCode,
+        expDate: expDate
+    }
+} 
+
+module.exports = {
+    usernameGenerator: usernameGenerator,
+    confirmCodeSendMail: confirmCodeSendMail
+};

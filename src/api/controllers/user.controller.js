@@ -1,13 +1,13 @@
 const { randomNumberGenerator, setDateMinutes } = require('../../helpers');
 const { user } = require('../../models');
 const { sendMessage } = require('../../services/emailService');
-const usernameGenerator = require('../../services/userService');
+const {usernameGenerator,confirmCodeSendMail} = require('../../services/userService');
 
 const userController = {
     getAll: async (req, res, next) => {
         try {
-            const page = req.params?.page || 0
-            const limit = req.params?.limit || 2
+            const page = req.query?.page || 0
+            const limit = req.query?.limit || 2
             const skip = page * limit;
             const users = await user.find().sort({ createdDate: 1 }).skip(skip).limit(limit).where({ isDeleted: false });
             console.log(users);
@@ -30,19 +30,20 @@ const userController = {
             if (userDb) {
                 throw new Error("Email is already taken");
             }
-            const confirmCode = randomNumberGenerator(100000, 999999);
-            const response = await sendMessage(confirmCode, email);
+            const confirmObj = await confirmCodeSendMail(email);
             const username = await usernameGenerator(fullName);
-            const expDate = setDateMinutes();
             const newUser = new user({
                 email: email,
                 username: username,
                 fullName: fullName,
-                confirmCode: confirmCode,
-                confirmCodeExpDate: expDate,
+                confirmCode: confirmObj.confirmCode,
+                confirmCodeExpDate: confirmObj.expDate,
             })
             newUser.save();
-            res.json(newUser);
+            res.json({
+                ok: true,
+                statusCode: 200
+            });
         } catch (error) {
             next(error);
         }

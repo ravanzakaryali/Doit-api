@@ -1,4 +1,6 @@
 const { user } = require("../../models");
+const { tokenGenerate } = require("../../services/tokenService");
+const { confirmCodeSendMail } = require("../../services/userService");
 
 const authController = {
     confirmEmail: async (req, res, next) => {
@@ -18,15 +20,53 @@ const authController = {
             if (!userConfirm) {
                 throw new Error("Confirm code error");
             }
-            const confirmDate = new Date(new Date(userConfirm.confirmCodeExpDate));
+            const confirmDate = new Date(userConfirm.confirmCodeExpDate);
             const nowDate = new Date();
-            console.log(confirmDate - nowDate);
-            res.json({
-                ok: "Ok"
+            if (confirmDate - nowDate < 0) {
+                throw new Error("Confirm code expired");
+            }
+            userDb.isConfirm = true;
+
+            const token = tokenGenerate({
+                email: userDb.email,
+                username: userDb.username
             })
+            userDb.save();
+            res.json({
+                token: token,
+                user: {
+                    email: userDb.email,
+                    username: userDb.username
+                }
+            });
         } catch (error) {
             next(error);
         }
+    },
+    login: async (req, res, next) => {
+        try {
+            const email = req.body.email;
+            const userDb = await user.findOne({
+                email: email
+            })
+            if (!userDb) {
+                throw new Error("User not found");
+            }
+            if (!userDb.isConfirm) {
+                throw new Error("Email not confirm!!!");
+            }
+            const confirmObj = await confirmCodeSendMail(email);
+            userDb.confirmCode = confirmObj.confirmCode;
+            userDb.confirmCodeExpDate = confirmObj.expDate;
+            userDb.save();
+            res.json({
+                ok: true,
+                statusCode: 200
+            });
+        } catch (error) {
+            next(error);
+        }
+
     }
 }
 

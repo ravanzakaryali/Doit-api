@@ -1,7 +1,6 @@
 const { Schema, default: mongoose } = require("mongoose");
 
-
-const todoSchema = new Schema({
+const taskSchema = new Schema({
     title: {
         type: String,
         required: true
@@ -16,14 +15,15 @@ const todoSchema = new Schema({
         type: Boolean,
         default: false
     },
-    isDeletd: {
+    isDeleted: {
         type: Boolean,
         default: false
     },
     deadLine: Date,
     user: {
+        type: mongoose.Schema.Types.ObjectId,
         ref: "User"
     }
 })
 
-module.exports = mongoose.model("Todo",todoSchema);
+module.exports = mongoose.model("Task", taskSchema);

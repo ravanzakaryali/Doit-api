@@ -1,12 +1,11 @@
-const { task } = require("../../models");
+const { task } = require('../../models/index');
 
 const taskController = {
     getAll: async (req, res, next) => {
         const page = req.query?.page || 0
         const limit = req.query?.limit || 2
         const skip = page * limit;
-        // console.log(req.param);
-        const tasks = await task.find().select('title content').sort({ createdDate: 1 }).skip(skip).limit(limit).where({ isDeleted: false });
+        const tasks = await task.find().sort({ createdDate: 1 }).skip(skip).limit(limit).where({ isDeleted: false });
         res.json({
             data: tasks,
             statusCode: 200
@@ -18,7 +17,7 @@ const taskController = {
             const taskDb = await task.findById(id).where({
                 isDeleted: false
             });
-            if (!taskDb) throw new Error("Task not found");
+            if (!taskDb) throw new Error("task not found");
             res.json({
                 data: taskDb,
                 statusCode: 200
@@ -29,18 +28,20 @@ const taskController = {
     },
     create: (req, res, next) => {
         try {
-            const title = req.body.title;
-            const content = req.body.content;
-            const deadLine = req.body.deadLine
-            console.log(new Date(deadLine));
-            const newTask = new task({
-                title: title,
-                content: content,
-                deadLine: deadLine
+            const projectId = req.body.projectId;
+            const dueDate = req.body.dueDate;
+            const topic = req.body.topic;
+            const assignedTo = req.body.assignedTo;
+            
+            const newtask = new task({
+                assignedTo: assignedTo,
+                topic: topic,
+                dueDate: dueDate,
+                project: projectId
             })
-            newTask.save();
+            newtask.save();
             res.json({
-                data: newTask,
+                data: newtask,
                 statusCode: 201
             })
         } catch (error) {

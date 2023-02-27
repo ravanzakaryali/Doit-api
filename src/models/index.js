@@ -1,5 +1,5 @@
-const user = require('./user.model');
 module.exports = {
-    user: user,
-    task: require('./task.model'),
+    user: require('./user.model'),
+    project: require('./project.model'),
+    task: require('./task.model')
 }

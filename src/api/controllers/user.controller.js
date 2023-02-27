@@ -1,7 +1,10 @@
+const BaseError = require('../../common/BaseError');
 const { randomNumberGenerator, setDateMinutes } = require('../../helpers');
 const { user } = require('../../models');
 const { sendMessage } = require('../../services/emailService');
-const {usernameGenerator,confirmCodeSendMail} = require('../../services/userService');
+const { usernameGenerator, confirmCodeSendMail } = require('../../services/userService');
+const { validationResult } = require("express-validator");
+
 
 const userController = {
     getAll: async (req, res, next) => {
@@ -22,13 +25,18 @@ const userController = {
     },
     register: async (req, res, next) => {
         try {
+            const errors = validationResult(req);
+            if (!errors.isEmpty()) {
+                return res.status(403).json(errors);
+            }
             const email = req.body.email;
             const fullName = req.body.fullName;
+
             const userDb = await user.findOne().where({
                 email: email
             })
             if (userDb) {
-                throw new Error("Email is already taken");
+                throw new BaseError("Email is already taken", 409);
             }
             const confirmObj = await confirmCodeSendMail(email);
             const username = await usernameGenerator(fullName);

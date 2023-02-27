@@ -62,7 +62,8 @@ const authController = {
             userDb.save();
             res.json({
                 ok: true,
-                statusCode: 200
+                statusCode: 200,
+                email: email
             });
         } catch (error) {
             next(error);

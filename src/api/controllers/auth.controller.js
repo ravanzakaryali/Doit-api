@@ -1,3 +1,4 @@
+const BaseError = require("../../common/BaseError");
 const { user } = require("../../models");
 const { tokenGenerate } = require("../../services/tokenService");
 const { confirmCodeSendMail } = require("../../services/userService");
@@ -50,10 +51,10 @@ const authController = {
                 email: email
             })
             if (!userDb) {
-                throw new Error("User not found");
+                throw new BaseError("User not found",404);
             }
             if (!userDb.isConfirm) {
-                throw new Error("Email not confirm!!!");
+                throw new BaseError("Email not confirm!!!",400);
             }
             const confirmObj = await confirmCodeSendMail(email);
             userDb.confirmCode = confirmObj.confirmCode;

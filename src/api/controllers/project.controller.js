@@ -53,7 +53,7 @@ const projectController = {
                 .findOne({})
                 .where({
                     isDeleted: false
-                }).sort({ dueDate: 'desc' }).populate("teamMembers","id profileImage").select('id description title teamMembers');
+                }).sort({ dueDate: 'desc' }).populate("teamMembers","id fullName profileImage").select('id description title teamMembers');
             res.json(projects);
         } catch (error) {
             next(error);

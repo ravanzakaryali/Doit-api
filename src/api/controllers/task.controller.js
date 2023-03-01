@@ -16,7 +16,7 @@ const taskController = {
             const id = req.params.id;
             const taskDb = await task.findById(id).where({
                 isDeleted: false
-            });
+            }).populate("project");
             if (!taskDb) throw new Error("task not found");
             res.json({
                 data: taskDb,

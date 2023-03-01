@@ -23,7 +23,11 @@ const projectSchema = new Schema({
     owner: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User"
-    }
+    },
+    teamMembers: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User"
+    }],
 })
 
 module.exports = mongoose.model("Project", projectSchema);

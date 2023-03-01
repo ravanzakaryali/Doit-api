@@ -34,6 +34,11 @@ const userSchema = new Schema({
     isConfirm: {
         type: Boolean,
         default: false
+    },
+    project: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Project",
+        require: false
     }
 })
 

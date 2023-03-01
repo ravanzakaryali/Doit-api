@@ -20,10 +20,10 @@ const taskSchema = new Schema({
         default: false
     },
     dueDate: Date,
-    topic: String,
-    assignedTo: {
+    content: String,
+    project: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "User"
+        ref: 'Project'
     }
 })
 

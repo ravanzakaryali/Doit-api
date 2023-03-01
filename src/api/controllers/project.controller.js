@@ -1,4 +1,4 @@
-const { project } = require("../../models");
+const { project, user, task } = require("../../models");
 
 const projectController = {
     getAll: async (req, res, next) => {
@@ -6,7 +6,7 @@ const projectController = {
         const limit = req.query?.limit || 2
         const sort = req.query?.sort || 'DueDate';
         const skip = page * limit;
-        let projectQuery =  project
+        let projectQuery = project
             .find()
             .select('title description')
             .skip(skip)
@@ -40,12 +40,9 @@ const projectController = {
             const id = req.params.id;
             const projectDb = await project.findById(id).where({
                 isDeleted: false
-            });
+            }).populate("owner").populate("teamMembers").populate("tasks");
             if (!projectDb) throw new Error("Project not found");
-            res.json({
-                data: projectDb,
-                statusCode: 200
-            })
+            res.json(projectDb);
         } catch (error) {
             next(error);
         }
@@ -62,22 +59,53 @@ const projectController = {
             next(error);
         }
     },
-    create: (req, res, next) => {
+    create: async (req, res, next) => {
         try {
             const title = req.body.title;
             const description = req.body.description;
             const dueDate = req.body.dueDate;
-            console.log(new Date(dueDate));
+            const ownerId = req.body.ownerId;
+            const teamMembers = req.body.members;
+            // memebers = [{id: "njsbdjsn"},{id: "dhushjd"}]
+            let teamMembersDb = [];
+
+            for (const element of teamMembers) {
+                const team = await user.findById(element.id);
+                if (team == null) throw new Error("Member not found");
+                console.log(team);
+                teamMembersDb.push(team);
+            }
+            const owner = await user.findById(ownerId);
+            if (owner == null) throw new Error("Owner not found");
             const newproject = new project({
                 title: title,
                 description: description,
-                dueDate: dueDate
+                dueDate: dueDate,
+                owner: owner,
+                teamMembers: teamMembersDb
             })
             newproject.save();
             res.json({
                 data: newproject,
                 statusCode: 201
             })
+        } catch (error) {
+            next(error);
+        }
+    },
+    createTask: async(req, res,next)=>{
+        try {
+            const projectId = req.params.id;
+            const content = req.body.content;
+
+            const projectDb = await project.findById(projectId);
+            if(projectId == null) throw new Error("Project not found");
+            const taskDb = new task({
+                project: projectDb,
+                content: content
+            });
+            taskDb.save();
+            res.json(taskDb);
         } catch (error) {
             next(error);
         }

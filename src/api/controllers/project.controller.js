@@ -8,12 +8,12 @@ const projectController = {
         const skip = page * limit;
         let projectQuery = project
             .find()
-            .select('title description')
+            .select('title description teamMembers')
             .skip(skip)
             .limit(limit)
             .where({
                 isDeleted: false,
-            });
+            }).populate('teamMembers');
         switch (sort.toLowerCase()) {
             case 'duedate':
                 projectQuery.sort({ dueDate: -1 })

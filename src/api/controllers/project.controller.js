@@ -53,7 +53,7 @@ const projectController = {
                 .findOne({})
                 .where({
                     isDeleted: false
-                }).sort({ dueDate: 'desc' });
+                }).sort({ dueDate: 'desc' }).populate("teamMembers","id profileImage").select('id description title teamMembers');
             res.json(projects);
         } catch (error) {
             next(error);
@@ -93,13 +93,13 @@ const projectController = {
             next(error);
         }
     },
-    createTask: async(req, res,next)=>{
+    createTask: async (req, res, next) => {
         try {
             const projectId = req.params.id;
             const content = req.body.content;
 
             const projectDb = await project.findById(projectId);
-            if(projectId == null) throw new Error("Project not found");
+            if (projectId == null) throw new Error("Project not found");
             const taskDb = new task({
                 project: projectDb,
                 content: content
